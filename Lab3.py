@@ -52,4 +52,18 @@ def server_loop():
         client_thread.start()
     
 
-    
+def client_handler(client_socket):
+    if len(execute):   # a predefined execution command globally to run on server side like -ls
+        output= run_command(execute)    #takes output from running the execute
+        client_socket.send(output)
+        
+    if command:
+        while True:
+            client_socket.send(b"<BHP:#> ") #convert into bytes for server reading using b
+            cmd_buffer="" #accumulates
+            
+            while "\n" not in cmd_buffer:
+                cmd_buffer+= client_socket.recv(1024).decode() #for human readable string
+                
+            response= run_command(cmd_buffer)
+            client_socket.send(response)
