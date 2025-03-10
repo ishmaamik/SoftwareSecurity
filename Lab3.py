@@ -4,7 +4,7 @@ import getopt #for parsing the command line- -l, -a, -t stands for what
 import threading #for spawning new threads so the processor doesn't get blocked by one process
 import subprocess #for getting, sending and storing output
 
-def client_handler(buffer):
+def client_sender(buffer):
     
     client= socket.socket(socket.AF_INET, socket.SOCK_STREAM)   #AF_INET for IPV4 protocol and SOCK_STREAM for TCP
     #Socket module of the socket library takes two args- Internet Address and protocol
@@ -32,3 +32,24 @@ def client_handler(buffer):
     except:  
         print("[*] Exception! Exiting.")
         client.close()
+        
+
+def server_loop():
+    global target
+    
+    if not len(target):
+        target= "0.0.0.0" #set for all available network ip address
+    
+    server= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(target, port)
+    server.listen(5)    #listens to 5 connections simultaneously
+    while True: #infinite loop, needs to continuously listen for incoming connections
+        client_socket, addr= server.accept()
+    
+        client_thread= threading.Thread(target=client_handler, args=client_socket)
+    #target function is the client_handler which handles the client
+    #and client_socket is passed to it cause this is how the client and server communicates
+        client_thread.start()
+    
+
+    
